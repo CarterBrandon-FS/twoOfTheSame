@@ -1,0 +1,23 @@
+{
+  "name": "twoofthesame",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "devDependencies": {
+    "express": "^5.2.1",
+    "jest": "^30.5.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.5",
+    "mongoose": "^9.10.4",
+    "morgan": "^1.12.1",
+    "nodemon": "^3.1.14"
+  }
+}
