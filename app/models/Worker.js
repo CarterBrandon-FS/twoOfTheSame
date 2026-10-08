@@ -1,3 +1,5 @@
+// Lets create the schema for the workers
+
 const mongoose = require("mongoose");
 
 const workerSchema = new mongoose.Schema({
