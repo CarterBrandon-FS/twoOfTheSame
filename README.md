@@ -67,3 +67,7 @@ The Postman collection is included in this repo. Import the JSON file into Postm
 Brandon Carter
 Server-Side Languages — WDV353
 Full Sail University
+
+## Testing
+
+- Testing in Postman passed for the 2 collection folders. Updated in MongoDB Conpass
