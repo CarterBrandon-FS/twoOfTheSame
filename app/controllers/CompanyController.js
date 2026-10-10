@@ -63,7 +63,7 @@ const updateCompany = async (req, res) => {
     if (!companyExisting) {
       return res.status(404).json({
         success: false,
-        message: Messages.company_updated,
+        message: Messages.company_not_found,
       });
     }
 
