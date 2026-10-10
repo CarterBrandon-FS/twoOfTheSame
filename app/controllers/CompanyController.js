@@ -1,13 +1,14 @@
 // Import the company model so we can query the database
 
 const Company = require("../models/Company");
+const Messages = require("../messages/Message");
 
 // lets implement the async and await functions
 // lets get all companies
 
 const getAllCompanies = async (req, res) => {
   try {
-    const companies = await Company.find();
+    const companies = await Company.find().select("-__v");
     res.status(200).json({ success: true, data: companies });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -19,12 +20,12 @@ const getAllCompanies = async (req, res) => {
 const getCompanyById = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = await Company.findById(id);
+    const company = await Company.findById(id).select("-__v");
 
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: `${req.method} - Company not found.`,
+        message: Messages.company_not_found,
       });
     }
     res.status(200).json({ success: true, data: company });
@@ -40,6 +41,7 @@ const createCompany = async (req, res) => {
     const company = await Company.create(req.body);
     res.status(201).json({
       success: true,
+      message: Messages.company_created,
       data: company,
     });
   } catch (error) {
@@ -55,19 +57,28 @@ const createCompany = async (req, res) => {
 const updateCompany = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = await Company.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
 
-    if (!company) {
+    // Check if the company exists
+    const companyExisting = await Company.findById(id);
+    if (!companyExisting) {
       return res.status(404).json({
         success: false,
-        message: `${req.method} - Company not found`,
+        message: Messages.company_updated,
       });
     }
-    res.status(200).json({ success: true, data: company });
+
+    // Update
+    const company = await Company.findByIdAndUpdate(id, req.body, {
+      new: true,
+    }).select("-__v");
+
+    res.status(200).json({
+      success: true,
+      message: Messages.company_updated,
+      data: company,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -76,24 +87,26 @@ const updateCompany = async (req, res) => {
 const deleteCompany = async (req, res) => {
   try {
     const { id } = req.params;
-    const company = await Company.findByIdAndDelete(id);
 
+    // Step 1: check if the company exists first
+    const company = await Company.findById(id).select("-__v");
     if (!company) {
       return res.status(404).json({
         success: false,
-        message: `${req.method} - Company not found`,
+        message: Messages.company_not_found,
       });
     }
 
+    // Step 2: now delete it
+    await Company.findByIdAndDelete(id);
+
     res.status(200).json({
       success: true,
+      message: Messages.company_deleted,
       data: company,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
