@@ -45,6 +45,33 @@ Connected to MongoDB: 127.0.0.1
 - PUT /api/workers/:id — update a worker
 - DELETE /api/workers/:id — delete a worker
 
+## Query Parameters for GET All Routes
+
+Both `/api/companies` and `/api/workers` support filtering, field selection, sorting, and pagination via query strings.
+
+### Companies
+
+- `?industry=Software` — filter by industry (exact match)
+- `?minFounded=2000&maxFounded=2020` — filter by founded year using MongoDB `$gte` and `$lte` operators
+- `?select=name,industry` — only return the specified fields
+- `?sort=foundedYear` or `?sort=-foundedYear` — sort ascending or descending
+- `?page=1&limit=5` — paginate results
+
+Example:
+GET /api/companies?industry=Software&sort=-foundedYear&page=1&limit=5
+
+### Workers
+
+- `?role=Developer` — filter by role (exact match)
+- `?minSalary=50000&maxSalary=100000` — filter by salary using MongoDB `$gte` and `$lte` operators
+- `?company=<companyId>` — filter by company reference
+- `?select=name,role` — only return the specified fields
+- `?sort=salary` or `?sort=-salary` — sort ascending or descending
+- `?page=1&limit=5` — paginate results
+
+Example:
+GET /api/workers?minSalary=50000&sort=-salary&page=1&limit=5
+
 ## The Relationship
 
 A Worker has a Company. The Worker schema stores the company's `_id` as an ObjectId reference. When you fetch workers, I use `.populate("company")` so the response includes the full company document instead of just the id. That's how the "has a" part works.
@@ -62,12 +89,10 @@ When you create a worker, send the company's `_id` in the body:
 
 The Postman collection is included in this repo. Import the JSON file into Postman, then run the collection to see all the tests pass.
 
+- Testing in Postman passed for the 2 collection folders. Updated in MongoDB Conpass
+
 ## About
 
 Brandon Carter
 Server-Side Languages — WDV353
 Full Sail University
-
-## Testing
-
-- Testing in Postman passed for the 2 collection folders. Updated in MongoDB Conpass
