@@ -24,7 +24,7 @@ Then start the server:
 npm run dev
 
 You should see:
-Server is running on port 3000
+Server is running on port 5000
 Connected to MongoDB: 127.0.0.1
 
 ## Endpoints

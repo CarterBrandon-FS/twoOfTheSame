@@ -4,6 +4,8 @@ const Messages = require("../messages/Message");
 
 // GET ALL WORKERS
 // Supports filtering, select, sort, and pagination via query strings.
+// GET ALL WORKERS
+// Supports filtering, select, sort, and pagination via query strings.
 const getAllWorkers = async (req, res) => {
   try {
     // ---- 1. FILTERING ----
@@ -44,13 +46,20 @@ const getAllWorkers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
     const skip = (page - 1) * limit;
 
-    // ---- Run the query ----
-    const workers = await Worker.find(filter)
+    // ---- Build the query ----
+    // Start with the base query (no sort yet)
+    let query = Worker.find(filter)
       .select(selectFields)
-      .sort(sortBy)
       .skip(skip)
       .limit(limit)
       .populate("company");
+
+    // Only add sort if a sort field was provided
+    if (sortBy) {
+      query = query.sort(sortBy);
+    }
+
+    const workers = await query;
 
     res.status(200).json({
       success: true,

@@ -1,3 +1,6 @@
+const Company = require("../models/Company");
+const Messages = require("../messages/Message");
+
 // GET ALL COMPANIES
 // Supports filtering, select, sort, and pagination via query strings.
 // Examples:
@@ -9,15 +12,13 @@
 
 const getAllCompanies = async (req, res) => {
   try {
-    // ---- 1. FILTERING with query operators ----
+    // ---- 1. FILTERING ----
     const filter = {};
 
-    // Exact match on industry
     if (req.query.industry) {
       filter.industry = req.query.industry;
     }
 
-    // Range filter on foundedYear using $gte and $lte
     if (req.query.minFounded || req.query.maxFounded) {
       filter.foundedYear = {};
       if (req.query.minFounded) {
@@ -28,16 +29,13 @@ const getAllCompanies = async (req, res) => {
       }
     }
 
-    // ---- 2. SELECT (which fields to include) ----
-    // Client sends ?select=name,industry → we convert commas to spaces
-    let selectFields = "-__v"; // by default, hide __v
+    // ---- 2. SELECT ----
+    let selectFields = "-__v";
     if (req.query.select) {
-      // Replace commas with spaces (mongoose wants space-separated)
       selectFields = req.query.select.split(",").join(" ");
     }
 
     // ---- 3. SORTING ----
-    // Client sends ?sort=foundedYear or ?sort=-foundedYear
     let sortBy = "";
     if (req.query.sort) {
       sortBy = req.query.sort.split(",").join(" ");
@@ -48,12 +46,19 @@ const getAllCompanies = async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
     const skip = (page - 1) * limit;
 
-    // ---- Build and run the query ----
-    const companies = await Company.find(filter)
+    // ---- Build the query ----
+    // Start with the base query, then conditionally add sort
+    let query = Company.find(filter)
       .select(selectFields)
-      .sort(sortBy)
       .skip(skip)
       .limit(limit);
+
+    // Only add sort if there's actually a sort field
+    if (sortBy) {
+      query = query.sort(sortBy);
+    }
+
+    const companies = await query;
 
     res.status(200).json({
       success: true,
